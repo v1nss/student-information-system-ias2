@@ -1,0 +1,166 @@
+import os 
+
+os.environ['TCL_LIBRARY'] = 'C:/Users/vince/AppData/Local/Programs/Python/Python312/tcl/tcl8.6'
+os.environ['TK_LIBRARY'] = 'C:/Users/vince/AppData/Local/Programs/Python/Python312/tcl/tk8.6'
+
+import random
+from tkinter import *
+from ttkbootstrap.constants import *
+import ttkbootstrap as ttkb
+from ttkbootstrap import Style
+
+window = ttkb.Window(themename="darkly")
+# style = Style(themename="darkly")
+window.title('Student Record Program')
+window.geometry('800x600')
+ttkb.Frame()
+ttkb.Entry()
+
+test_label = ttkb.Label(text = 'Student Record Program', font=("Helvetica", 20))
+test_label.pack(pady=60)
+
+left_frame = ttkb.Frame(window)
+# left_frame.pack(side=LEFT, padx=80, pady=0)
+left_frame.place(x=100, y=200)
+# left_frame.configure()
+
+# Create a frame to display content on the right
+right_frame = ttkb.Frame(window)
+right_frame.place(x=330, y=130)
+right_frame.config(width=400, height=600)
+
+def random_num():
+    header = "TUPM-21-"
+    randnum = str(random.randint(1000,9999))
+    studentID = ("".join([header, randnum]))
+
+    return studentID
+
+# Function to display content based on the button clicked
+def show_content(content):
+    # Clear the previous content
+    for widget in right_frame.winfo_children():
+        widget.destroy()
+    
+    # Display new content based on the button clicked
+    label = Label(right_frame, text=content, font=("Helvetica", 16))
+    label.pack()
+
+def show_addStudent(content):
+
+    studentID = random_num()
+    # Clear the previous content
+    for widget in right_frame.winfo_children():
+        widget.destroy()
+
+    frame = ttkb.Frame(right_frame)
+    frame.pack()
+    frame.config(width=400, height=600)
+
+  # Display new content based on the button clicked
+    label_title = Label(frame, text=content, font=("Helvetica", 20))
+    label_title.place(x=130, y=20)
+
+    label_id = Label(frame, text='Student ID:', font=("Helvetica", 12))
+    label_id.place(x=50, y=80)
+
+    label_id = Label(frame, text=studentID, font=("Helvetica", 12))
+    label_id.place(x=150, y=80)
+
+    label_name = Label(frame, text='Name:', font=("Helvetica", 12))
+    label_name.place(x=50, y=120)
+
+    entry_name = Entry(frame, font=("Helvetica", 12))
+    entry_name.place(x=150, y=120)
+
+    label_birthdate = Label(frame, text='Birth Date:', font=("Helvetica", 12))
+    label_birthdate.place(x=50, y=160)
+
+    entry_birthdate = Entry(frame, font=("Helvetica", 12))
+    entry_birthdate.place(x=150, y=160)
+
+    label_age = Label(frame, text='Age:', font=("Helvetica", 12))
+    label_age.place(x=50, y=200)
+
+    entry_age = Entry(frame, font=("Helvetica", 12))
+    entry_age.place(x=150, y=200)
+
+    label_gender = Label(frame, text='Gender:', font=("Helvetica", 12))
+    label_gender.place(x=50, y=240)
+
+    entry_gender = Entry(frame, font=("Helvetica", 12))
+    entry_gender.place(x=150, y=240)
+
+    label_address = Label(frame, text='Address:', font=("Helvetica", 12))
+    label_address.place(x=50, y=280)
+
+    entry_address = Entry(frame, font=("Helvetica", 12))
+    entry_address.place(x=150, y=280)
+
+    label_course = Label(frame, text='Course:', font=("Helvetica", 12))
+    label_course.place(x=50, y=320)
+
+    entry_course = Entry(frame, font=("Helvetica", 12))
+    entry_course.place(x=150, y=320)
+
+    label_yearlvl = Label(frame, text='Year Level:', font=("Helvetica", 12))
+    label_yearlvl.place(x=50, y=360)
+
+    entry_yearlvl = Entry(frame, font=("Helvetica", 12))
+    entry_yearlvl.place(x=150, y=360)
+
+    # Create a button to submit the form
+    submit_button = ttkb.Button(frame, text="Add Student", width=20, bootstyle=SUCCESS, command=lambda: submit_form(studentID, [ entry_name, entry_birthdate, entry_age, entry_gender, 
+                                                                                                                entry_address, entry_course, entry_yearlvl]))
+    submit_button.place(x=150, y=410)
+
+
+def submit_form(studentID, entries):
+      # Retrieve values from entry widgets
+    values = [entry.get() for entry in entries]
+    
+    # Write values to a text file
+    with open('student_records.txt', 'a') as file:
+        file.write(studentID+",")
+        file.write(','.join(values) + '\n')
+    
+    print("Data saved to student_records.txt")
+    
+def show_deleteStudent(content):
+    for widget in right_frame.winfo_children():
+        widget.destroy()
+
+    frame = ttkb.Frame(right_frame)
+    frame.pack()
+    frame.config(width=400, height=600)
+
+    label_title = Label(frame, text=content, font=("Helvetica", 20))
+    label_title.place(x=120, y=20)
+
+    label_name = Label(frame, text='Search ID:', font=("Helvetica", 12))
+    label_name.place(x=50, y=80)
+
+    entry_name = Entry(frame, font=("Helvetica", 12))
+    entry_name.place(x=150, y=80)
+    
+
+# Create buttons on the left side
+
+button1 = ttkb.Button(left_frame, text="Add Student", width=20, bootstyle=SUCCESS, command=lambda: show_addStudent('Add Student'))
+button1.pack(pady=15)
+
+button2 = ttkb.Button(left_frame, text="Delete Student", width=20, bootstyle=SUCCESS, command=lambda: show_deleteStudent('Delete Student'))
+button2.pack(pady=15)
+
+button3 = ttkb.Button(left_frame, text="View Students", width=20, bootstyle=SUCCESS, command=lambda: show_content('View Students'))
+button3.pack(pady=15)
+
+button4 = ttkb.Button(left_frame, text="Update Students", width=20, bootstyle=SUCCESS, command=lambda: show_content('Update Students'))
+button4.pack(pady=15)
+
+button5 = ttkb.Button(left_frame, text="Search Students", width=20, bootstyle=SUCCESS, command=lambda: show_content('Search Students'))
+button5.pack(pady=15)
+
+
+
+window.mainloop()
