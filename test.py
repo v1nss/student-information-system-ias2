@@ -1,22 +1,25 @@
-def xor_encrypt_decrypt(data, key):
-    # Initialize the encrypted/decrypted result as an empty string
-    result = ''
+def dec(encrypted_text, keyword):
+    decrypted_text = ''
+    keyword_index = 0
 
-    # Perform XOR operation for each character of data with the corresponding character of the key
-    for i in range(len(data)):
-        # Calculate the ASCII value of the XOR result
-        xor_result = ord(data[i]) ^ ord(key[i % len(key)])  # Use modulo to repeat the key if it's shorter than data
-        # Convert the ASCII value back to a character and add it to the result
-        result += chr(xor_result)
+    for char in encrypted_text:
+        if char.isalpha() or char.isdigit():
+            # Determine the shift amount based on the keyword character
+            shift = ord(keyword[keyword_index % len(keyword)].lower()) - ord('a')
+            keyword_index += 1
 
-    return result
+            # Apply the reverse shift to decrypt the current character
+            if char.islower():
+                shifted = chr(((ord(char) - ord('a') - shift + 26) % 26) + ord('a'))
+            elif char.isupper():
+                shifted = chr(((ord(char) - ord('A') - shift + 26) % 26) + ord('A'))
+            elif char.isdigit():
+                shifted = chr(((ord(char) - ord('0') - shift + 10) % 10) + ord('0'))
+        else:
+            shifted = char
 
-# Example usage:
-plaintext = "TUPM-21-4882,Vincent Robles,June 27 2003,20,Male,4416 F. Macabagdal St. Brgy Ugong Valenzuela City,BSIS-NS,3"
-encryption_key = "mysecretkey"
+        decrypted_text += shifted
 
-encrypted_data = xor_encrypt_decrypt(plaintext, encryption_key)
-print("Encrypted:", encrypted_data)
+    return decrypted_text
 
-decrypted_data = xor_encrypt_decrypt(encrypted_data, encryption_key)
-print("Decrypted:", decrypted_data)
+print(dec("Nmptigl", "SECRET"))

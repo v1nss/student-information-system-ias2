@@ -16,7 +16,7 @@ window.geometry('900x600')
 ttkb.Frame()
 ttkb.Entry()
 
-test_label = ttkb.Label(text = 'Student Record Program', font=("Helvetica", 20))
+test_label = ttkb.Label(text = 'Student Information System', font=("Helvetica", 20))
 test_label.pack(pady=60)
 
 left_frame = ttkb.Frame(window)
@@ -114,17 +114,94 @@ def show_addStudent(content):
                                                                                                                 entry_address, entry_course, entry_yearlvl]))
     submit_button.place(x=150, y=410)
 
+def enc(plaintext, keyword):
+    encrypted_text = ''
+    keyword_index = 0
+
+    for char in plaintext:
+        if char.isalpha() or char.isdigit():
+            # Determine the shift amount based on the keyword character
+            shift = ord(keyword[keyword_index % len(keyword)].lower()) - ord('a')
+            keyword_index += 1
+
+            # Apply the shift to the current character
+            if char.islower():
+                shifted = chr(((ord(char) - ord('a') + shift) % 26) + ord('a'))
+            elif char.isupper():
+                shifted = chr(((ord(char) - ord('A') + shift) % 26) + ord('A'))
+            elif char.isdigit():
+                shifted = chr(((ord(char) - ord('0') + shift) % 10) + ord('0'))
+        else:
+            shifted = char
+
+        encrypted_text += shifted
+
+    return encrypted_text
+
+def dec(ciphertext, keyword):
+    decrypted_text = ''
+    keyword_index = 0
+
+    for char in ciphertext:
+        if char.isalpha() or char.isdigit():
+            # Determine the shift amount based on the keyword character
+            shift = ord(keyword[keyword_index % len(keyword)].lower()) - ord('a')
+            keyword_index += 1
+
+            # Apply the reverse shift to decrypt the current character
+            if char.islower():
+                shifted = chr(((ord(char) - ord('a') - shift + 26) % 26) + ord('a'))
+            elif char.isupper():
+                shifted = chr(((ord(char) - ord('A') - shift + 26) % 26) + ord('A'))
+            elif char.isdigit():
+                shifted = chr(((ord(char) - ord('0') - shift + 10) % 10) + ord('0'))
+        else:
+            shifted = char
+
+        decrypted_text += shifted
+
+    return decrypted_text
 
 def submit_form(studentID, entries):
-      # Retrieve values from entry widgets
+    # Retrieve values from entry widgets
     values = [entry.get() for entry in entries]
     
-    # Write values to a text file
+    # Encrypt the values using the Vigenère cipher with a keyword
+    keyword = 'SECRET'  # You can use any keyword here
+    encrypted_values = [enc(value, keyword) for value in values]
+    
+    # Write encrypted values to a text file
     with open('student_records.txt', 'a') as file:
-        file.write(studentID+",")
-        file.write(','.join(values) + '\n')
+        file.write(studentID + ",")
+        file.write(','.join(encrypted_values) + '\n')
     
     print("Data saved to student_records.txt")
+# def encrypt_data(data, shift):
+#     encrypted = ''
+#     for char in data:
+#         if char.isalpha():
+#             shifted = ord(char) + shift
+#             if char.islower():
+#                 if shifted > ord('z'):
+#                     shifted -= 26
+#             elif char.isupper():
+#                 if shifted > ord('Z'):
+#                     shifted -= 26
+#             encrypted += chr(shifted)
+#         else:
+#             encrypted += char
+#     return encrypted
+
+# def submit_form(studentID, entries):
+#       # Retrieve values from entry widgets
+#     values = [entry.get() for entry in entries]
+    
+#     # Write values to a text file
+#     with open('student_records.txt', 'a') as file:
+#         file.write(studentID+",")
+#         file.write(','.join(values) + '\n')
+    
+#     print("Data saved to student_records.txt")
     
 def show_deleteStudent(content):
     for widget in right_frame.winfo_children():
@@ -171,7 +248,10 @@ def search_student(student_id):
         data = line.strip().split(',')
         if data[0] == student_id:
             found = True
-            show_student_details(data)
+            # Decrypt the relevant data
+            decrypted_data = [dec(value, 'SECRET') for value in data[1:]]
+            decrypted_data.insert(0, data[0])  # Insert student ID without decryption
+            show_student_details(decrypted_data)
             break
     
     if not found:
@@ -256,15 +336,17 @@ def show_students(content):
         lines = file.readlines()
 
     for line in lines:
-        student_data = line.strip().split(',')
-        text_area.insert(END, f"Student ID: {student_data[0]}\n")
-        text_area.insert(END, f"Name: {student_data[1]}\n")
-        text_area.insert(END, f"Birth Date: {student_data[2]}\n")
-        text_area.insert(END, f"Age: {student_data[3]}\n")
-        text_area.insert(END, f"Gender: {student_data[4]}\n")
-        text_area.insert(END, f"Address: {student_data[5]}\n")
-        text_area.insert(END, f"Course: {student_data[6]}\n")
-        text_area.insert(END, f"Year Level: {student_data[7]}\n\n")
+        student_data_encrypted = line.strip().split(',')
+        text_area.insert(END, f"Student ID: {student_data_encrypted[0]}\n")
+        student_data_decrypted = [dec(data, "SECRET") for data in student_data_encrypted]
+        
+        text_area.insert(END, f"Name: {student_data_decrypted[1]}\n")
+        text_area.insert(END, f"Birth Date: {student_data_decrypted[2]}\n")
+        text_area.insert(END, f"Age: {student_data_decrypted[3]}\n")
+        text_area.insert(END, f"Gender: {student_data_decrypted[4]}\n")
+        text_area.insert(END, f"Address: {student_data_decrypted[5]}\n")
+        text_area.insert(END, f"Course: {student_data_decrypted[6]}\n")
+        text_area.insert(END, f"Year Level: {student_data_decrypted[7]}\n\n")
 
     text_area.config(state=DISABLED)
 
@@ -297,7 +379,9 @@ def search_student_for_update(student_id):
         data = line.strip().split(',')
         if data[0] == student_id:
             found = True
-            show_update_form(data)
+            decrypted_data = [dec(value, 'SECRET') for value in data[1:]]
+            decrypted_data.insert(0, data[0])  # Insert student ID without decryption
+            show_update_form(decrypted_data)
             break
     
     if not found:
@@ -365,21 +449,48 @@ def show_update_form(student_data):
     update_button = Button(right_frame, text="Update", width=10, command=lambda: update_student_info(student_data[0], entry_name.get(), entry_birthdate.get(), entry_age.get(), entry_gender.get(), entry_address.get(), entry_course.get(), entry_yearlvl.get()))
     update_button.place(x=180, y=400)
 
+# def update_student_info(student_id, name, birthdate, age, gender, address, course, yearlvl):
+#     with open('student_records.txt', 'r') as file:
+#         lines = file.readlines()
+
+#     updated_lines = []
+#     for line in lines:
+#         data = line.strip().split(',')
+
+#         if data[0] == student_id:
+#             data[1] = name
+#             data[2] = birthdate
+#             data[3] = age
+#             data[4] = gender
+#             data[5] = address
+#             data[6] = course
+#             data[7] = yearlvl
+#             updated_lines.append(','.join(data) + '\n')
+#         else:
+#             updated_lines.append(line)
+
+#     with open('student_records.txt', 'w') as file:
+#         file.writelines(updated_lines)
+
+#     print(f"Student with ID {student_id} updated.")
+    
 def update_student_info(student_id, name, birthdate, age, gender, address, course, yearlvl):
     with open('student_records.txt', 'r') as file:
         lines = file.readlines()
 
+    keyword = "SECRET"
     updated_lines = []
     for line in lines:
         data = line.strip().split(',')
+        
         if data[0] == student_id:
-            data[1] = name
-            data[2] = birthdate
-            data[3] = age
-            data[4] = gender
-            data[5] = address
-            data[6] = course
-            data[7] = yearlvl
+            data[1] = enc(name, keyword)
+            data[2] = enc(birthdate, keyword)
+            data[3] = enc(age, keyword)
+            data[4] = enc(gender, keyword)
+            data[5] = enc(address, keyword)
+            data[6] = enc(course, keyword)
+            data[7] = enc(yearlvl, keyword)
             updated_lines.append(','.join(data) + '\n')
         else:
             updated_lines.append(line)
@@ -388,6 +499,7 @@ def update_student_info(student_id, name, birthdate, age, gender, address, cours
         file.writelines(updated_lines)
 
     print(f"Student with ID {student_id} updated.")
+
 # Create buttons on the left side
 
 button1 = ttkb.Button(left_frame, text="Add Student", width=20, bootstyle=SUCCESS, command=lambda: show_addStudent('Add Student'))
@@ -402,9 +514,7 @@ button3.pack(pady=15)
 button4 = ttkb.Button(left_frame, text="Update Students", width=20, bootstyle=SUCCESS, command=lambda: show_updateStudent('Update Students'))
 button4.pack(pady=15)
 
-button5 = ttkb.Button(left_frame, text="Search Students", width=20, bootstyle=SUCCESS, command=lambda: show_content('Search Students'))
-button5.pack(pady=15)
-
-
+# button5 = ttkb.Button(left_frame, text="Search Students", width=20, bootstyle=SUCCESS, command=lambda: show_content('Search Students'))
+# button5.pack(pady=15)
 
 window.mainloop()
