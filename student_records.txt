@@ -1,5 +1,1 @@
-TUPM-21-4882,Vincent F. Robles,June 27 2003,20,Male,4416 F. Macabagdal St. Brgy Ugong Valenzuela City,BSIS-NS,3
-TUPM-21-4882,Vincent F. Robles,June 27 2003,20,Male,4416 F. Macabagdal St. Brgy Ugong Valenzuela City,BSIS-NS,3
-TUPM-21-4882,Vincent F. Robles,June 27 2003,20,Male,4416 F. Macabagdal St. Brgy Ugong Valenzuela City,BSIS-NS,3
-TUPM-21-4882,Vincent F. Robles,June 27 2003,20,Male,4416 F. Macabagdal St. Brgy Ugong Valenzuela City,BSIS-NS,3
-TUPM-21-4882,Vincent F. Robles,June 27 2003,20,Male,4416 F. Macabagdal St. Brgy Ugong Valenzuela City,BSIS-NS,3
+TUPM-21-4882,Vincent Robles,June 27 2003,20,Male,4416 Valenzuela,BSIS-NS,3
